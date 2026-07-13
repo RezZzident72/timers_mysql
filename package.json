@@ -6,7 +6,7 @@
   "keywords": [],
   "main": "index.js",
   "scripts": {
-    "build": "knex migrate:latest",
+    "build": "knex migrate:latest --env production",
     "start": "node index.js"
   },
   "engines": {
