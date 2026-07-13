@@ -22,16 +22,24 @@ nunjucks.configure("views", {
   },
 });
 
-const knex = require("knex")({
-  client: "pg",
-  connection: {
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    port: process.env.DB_PORT,
-  },
-});
+
+let knex;
+if (!global.cachedKnex) {
+  global.cachedKnex = require("knex")({
+    client: "pg",
+    connection: {
+      host: process.env.DB_HOST,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+      port: process.env.DB_PORT,
+      ssl: { rejectUnauthorized: false }
+    },
+    pool: { min: 0, max: 10 }
+  });
+}
+knex = global.cachedKnex;
+
 
 app.set("view engine", "njk");
 
@@ -97,7 +105,14 @@ app.post("/login", async (req, res) => {
   }
 
   const sessionId = await createSession(findUser.id);
-  res.cookie("sessionId", sessionId, { httpOnly: true, signed: true }).redirect("/");
+  res
+    .cookie("sessionId", sessionId, {
+      httpOnly: true,
+      signed: true,
+      secure: true,
+      sameSite: "lax",
+    })
+    .redirect("/");
 });
 //Выход
 app.get("/logout", auth(), async (req, res) => {
@@ -123,7 +138,14 @@ app.post("/signup", async (req, res) => {
   });
 
   const sessionId = await createSession(newUser.id);
-  res.cookie("sessionId", sessionId, { httpOnly: true, signed: true}).redirect("/");
+  res
+    .cookie("sessionId", sessionId, {
+      httpOnly: true,
+      signed: true,
+      secure: true,
+      sameSite: "lax",
+    })
+    .redirect("/");
 });
 
 /* ------------------------------- */
