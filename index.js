@@ -23,7 +23,6 @@ nunjucks.configure(path.join(__dirname, "views"), {
   },
 });
 
-
 let knex;
 if (!global.cachedKnex) {
   global.cachedKnex = require("knex")({
@@ -34,13 +33,12 @@ if (!global.cachedKnex) {
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
       port: process.env.DB_PORT,
-      ssl: { rejectUnauthorized: false }
+      ssl: { rejectUnauthorized: false },
     },
-    pool: { min: 0, max: 10 }
+    pool: { min: 0, max: 10 },
   });
 }
 knex = global.cachedKnex;
-
 
 app.set("view engine", "njk");
 
