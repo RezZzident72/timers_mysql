@@ -6,7 +6,7 @@
   "keywords": [],
   "main": "index.js",
   "scripts": {
-    "build": "knex migrate:latest",
+    "build": "echo 'No build step needed'",
     "start": "node index.js",
     "dev": "nodemon index.js"
   },

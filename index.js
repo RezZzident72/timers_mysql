@@ -222,6 +222,18 @@ app.post("/api/timers/:id/stop", auth(), async (req, res) => {
 
 const port = process.env.PORT || 3000;
 
-app.listen(port, async () => {
-  console.log(`  Listening on http://localhost:${port}`);
-});
+async function startServer() {
+  try {
+    // Накатываем миграции непосредственно перед запуском сервера
+    await knex.migrate.latest();
+    console.log("  [Knex] Миграции успешно проверены/применены в Neon!");
+  } catch (err) {
+    console.error("  [Knex] Ошибка миграций при старте:", err.message);
+  }
+
+  app.listen(port, () => {
+    console.log(`  Listening on http://localhost:${port}`);
+  });
+}
+
+startServer();
