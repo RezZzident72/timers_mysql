@@ -25,17 +25,23 @@ nunjucks.configure(path.join(__dirname, "views"), {
 
 let knex;
 if (!global.cachedKnex) {
+  const isServerless = !!process.env.DATABASE_URL;
+
   global.cachedKnex = require("knex")({
     client: "pg",
-    connection: {
-      host: process.env.DB_HOST,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-      port: process.env.DB_PORT,
-      ssl: { rejectUnauthorized: false },
-    },
-    pool: { min: 0, max: 10 },
+    connection: isServerless
+      ? {
+          connectionString: process.env.DATABASE_URL,
+          ssl: { rejectUnauthorized: false },
+        }
+      : {
+          host: process.env.DB_HOST,
+          user: process.env.DB_USER,
+          password: process.env.DB_PASSWORD,
+          database: process.env.DB_NAME,
+          port: Number(process.env.DB_PORT) || 5432,
+        },
+    pool: { min: 0, max: isServerless ? 2 : 10 },
   });
 }
 knex = global.cachedKnex;
