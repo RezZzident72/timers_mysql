@@ -122,30 +122,40 @@ app.get("/logout", auth(), async (req, res) => {
 });
 //Регистрация
 app.post("/signup", async (req, res) => {
-  const newUser = {
-    id: crypto.randomUUID(),
-    name: req.body.username,
-    password: req.body.password,
-  };
+  try {
+    const newUser = {
+      id: crypto.randomUUID(),
+      name: req.body.username,
+      password: req.body.password,
+    };
 
-  const hashPassword = await bcrypt.hash(newUser.password, 10);
+    const hashPassword = await bcrypt.hash(newUser.password, 10);
 
-  await knex("users").insert({
-    id: newUser.id,
-    name: newUser.name,
-    password: hashPassword,
-  });
+    console.log("Попытка регистрации пользователя:", newUser.name);
 
-  const sessionId = await createSession(newUser.id);
-  res
-    .cookie("sessionId", sessionId, {
-      httpOnly: true,
-      signed: true,
-      secure: true,
-      sameSite: "lax",
-    })
-    .redirect("/");
+    await knex("users").insert({
+      id: newUser.id,
+      name: newUser.name,
+      password: hashPassword,
+    });
+
+    const sessionId = await createSession(newUser.id);
+
+    res
+      .cookie("sessionId", sessionId, {
+        httpOnly: true,
+        signed: true,
+        secure: true,
+        sameSite: "lax",
+      })
+      .redirect("/");
+  } catch (error) {
+    console.error("КРИТИЧЕСКАЯ ОШИБКА РЕГИСТРАЦИИ:", error);
+    res.status(500).setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.send(`<h1 style="color:red;">Ошибка сервера при регистрации:</h1><pre>${error.stack}</pre>`);
+  }
 });
+
 
 /* ------------------------------- */
 
