@@ -4,12 +4,13 @@ const cookieParser = require("cookie-parser");
 const crypto = require("crypto");
 const nunjucks = require("nunjucks");
 const bcrypt = require("bcryptjs");
+const path = require("path");
 
 require("dotenv").config();
 
 const app = express();
 
-nunjucks.configure("views", {
+nunjucks.configure(path.join(__dirname, "views"), {
   autoescape: true,
   express: app,
   tags: {
