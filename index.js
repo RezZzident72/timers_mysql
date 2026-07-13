@@ -224,9 +224,4 @@ const port = process.env.PORT || 3000;
 
 app.listen(port, () => {
   console.log(`  Listening on http://localhost:${port}`);
-
-  knex.migrate
-    .latest()
-    .then(() => console.log("  Таблицы успешно созданы в Neon!"))
-    .catch((err) => console.error(" Ошибка создания таблиц:", err.message));
 });

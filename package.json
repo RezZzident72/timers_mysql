@@ -6,9 +6,8 @@
   "keywords": [],
   "main": "index.js",
   "scripts": {
-    "build": "echo 'No build step needed'",
-    "start": "node index.js",
-    "dev": "nodemon index.js"
+    "build": "knex migrate:latest",
+    "start": "node index.js"
   },
   "engines": {
     "node": "24.x"
