@@ -1,25 +1,28 @@
 require("dotenv").config();
 
-const connection = {
+const connectionString = process.env.DATABASE_URL || {
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  port: process.env.DB_PORT,
-  ssl: true,
+  port: Number(process.env.DB_PORT) || 5432,
 };
 
 module.exports = {
   development: {
     client: "postgresql",
-    connection: connection,
+    connection: connectionString,
     migrations: {
       directory: "./migrations",
     },
   },
   production: {
     client: "postgresql",
-    connection: connection,
+    connection: {
+      connectionString: typeof connectionString === "string" ? connectionString : undefined,
+      ...(typeof connectionString === "object" ? connectionString : {}),
+      ssl: { rejectUnauthorized: false },
+    },
     migrations: {
       directory: "./migrations",
     },
